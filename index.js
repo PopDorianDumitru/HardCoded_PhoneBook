@@ -1,7 +1,7 @@
 const express = require('express');
 
 const app = express();
-
+app.use(express.json());
 let persons = [
     { 
         "id": 1,
@@ -51,6 +51,35 @@ app.delete('/api/persons/:id', (request, response) =>{
     const id = Number(request.params.id);
     persons = persons.filter(person => person.id !== id);
     response.status(204).end();
+})
+
+app.post('/api/persons', (request, response) =>{
+    const body = request.body;
+    console.log(body);
+    if(!body.number)
+        return response.status(400).json({error: "content missing"});
+
+
+
+
+    const generateId = () =>{
+        return Math.floor(Math.random()*10000);
+    }
+    
+    const person = {
+        name: body.name,
+        number: body.number,
+        id: generateId(),
+    }
+
+    const unique_name = persons.find(p=>p.name ===person.name);
+    if(unique_name)
+        return response.status(400).json({error: "Name is not unique"});
+    const unique_number = persons.find(p=>p.number === person.number);
+    if(unique_number)
+        return response.status(400).json({error: "Phone number is already in use"});
+    persons = persons.concat(person);
+    response.json(persons);
 })
 
 const PORT = 3001;
