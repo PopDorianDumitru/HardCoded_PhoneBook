@@ -1,7 +1,21 @@
 const express = require('express');
 
+
+
 const app = express();
 app.use(express.json());
+
+const requestLogger = (request, response, next) =>{
+    console.log("METHOD: ", request.method);
+    console.log('Path: ', request.path);
+    console.log('Body: ', request.body);
+    console.log('---');
+
+    next();
+}
+
+
+app.use(requestLogger);
 let persons = [
     { 
         "id": 1,
@@ -44,7 +58,9 @@ app.get('/api/persons/:id', (request, response) => {
     const person = persons.find(person => person.id === id);
     if(!person)
         return response.status(404).end();
+    
     response.json(person);
+    
 })
 
 app.delete('/api/persons/:id', (request, response) =>{
@@ -81,6 +97,12 @@ app.post('/api/persons', (request, response) =>{
     persons = persons.concat(person);
     response.json(persons);
 })
+
+const unknownEndpoint = (request, response) => {
+    response.status(404).send({ error: 'unknown endpoint' })
+  }
+  
+app.use(unknownEndpoint)
 
 const PORT = 3001;
 app.listen(PORT, () =>{
