@@ -1,21 +1,26 @@
+const { json } = require('express');
 const express = require('express');
+const morgan = require('morgan');
 
-
+morgan.token('fullstack', (request) =>{
+   return JSON.stringify(request.body);
+})
 
 const app = express();
 app.use(express.json());
 
-const requestLogger = (request, response, next) =>{
+/*const requestLogger = (request, response, next) =>{
     console.log("METHOD: ", request.method);
     console.log('Path: ', request.path);
     console.log('Body: ', request.body);
     console.log('---');
 
     next();
-}
+}*/
 
 
-app.use(requestLogger);
+///app.use(requestLogger);
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms :fullstack '));
 let persons = [
     { 
         "id": 1,
